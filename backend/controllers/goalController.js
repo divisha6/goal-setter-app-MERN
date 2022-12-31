@@ -9,12 +9,11 @@ const Goal = require("../models/goalModel");
 // @route: GET/api/goals
 // @access: private
 const getGoals = asyncHandler(async (req, res) => {
-  const goals = await Goal.find()
+  const goals = await Goal.find();
   // find() method because it aligns with GET API method
   //in the () of find, we will put the parameters using which we will find the goals. For us, it will be the user.
-  res.status(200).json(goals)
+  res.status(200).json(goals);
 });
-
 
 // @description:  Set goals
 // @route: POST/api/goals
@@ -27,24 +26,42 @@ const setGoals = asyncHandler(async (req, res) => {
   }
 
   const goal = await Goal.create({
-    text: req.body.text
-  })  // create because it aligns with the POST API method
+    text: req.body.text,
+  }); // create because it aligns with the POST API method
 
   res.status(200).json(goal);
-})
+});
 
 // @description:  Update goals
 // @route: PUT/api/goals
 // @access: private
 const updateGoals = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `Update goal ${req.params.id}` });
+  const goal = await Goal.findById(req.params.id);
+
+  if (!goal) {
+    res.status(400);
+    throw new Error("Goal not found");
+  }
+
+  const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
+    new: true, //options object which will create it if it doesnt exist
+  });
+
+  res.status(200).json(updatedGoal);
 });
 
 // @description:  Delete goals
 // @route: GET/api/goals
 // @access: private
 const deleteGoals = asyncHandler(async (req, res) => {
-  res.status(200).json({ message: `Delete goal ${req.params.id}` });
+  const goal = await Goal.findById(req.params.id);
+
+  if (!goal) {
+    res.status(400);
+    throw new Error("Goal not found");
+  }
+  await goal.remove
+  res.status(200).json({ id: req.params.id });
 });
 
 // eexporting
