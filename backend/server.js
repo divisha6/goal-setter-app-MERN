@@ -19,7 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false })); //middleware lines
 
 app.use("/api/goals", require("./routes/goalRoutes"));
-// this will look into the specified file and will add the path specified there to the pat specified here.
+// this will look into the specified file and will add the path specified there to the path specified here.
+app.use("/api/users", require("./routes/userRoutes"));
 
 app.use(errorHandler);
 
