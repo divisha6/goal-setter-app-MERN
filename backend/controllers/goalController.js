@@ -4,12 +4,13 @@ const asyncHandler = require("express-async-handler");
 
 const Goal = require("../models/goalModel");
 // Goal will have a bunch of mongoose models that we can use to create, read our database
+const User = require('../models/userModel')
 
 // @description:  Get goals
 // @route: GET/api/goals
 // @access: private
 const getGoals = asyncHandler(async (req, res) => {
-  const goals = await Goal.find();
+  const goals = await Goal.find({user : req.user.id});
   // find() method because it aligns with GET API method
   //in the () of find, we will put the parameters using which we will find the goals. For us, it will be the user.
   res.status(200).json(goals);
@@ -27,6 +28,7 @@ const setGoals = asyncHandler(async (req, res) => {
 
   const goal = await Goal.create({
     text: req.body.text,
+    user : req.user.id,
   }); // create because it aligns with the POST API method
 
   res.status(200).json(goal);
@@ -41,6 +43,20 @@ const updateGoals = asyncHandler(async (req, res) => {
   if (!goal) {
     res.status(400);
     throw new Error("Goal not found");
+  }
+
+  const user = await User.findById(req.user.id)
+
+  // Check for user
+  if(!user){
+    res.status(401)
+    throw new Error('User not found')
+  }
+
+  // make sure the logged in user matches the goal user
+  if(goal.user.toString() !== req.user.id){
+    res.status(401)
+    throw new Error('User not authorized')
   }
 
   const updatedGoal = await Goal.findByIdAndUpdate(req.params.id, req.body, {
@@ -60,9 +76,24 @@ const deleteGoals = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Goal not found");
   }
+
+  const user = await User.findById(req.user.id)
+
+  // Check for user
+  if(!user){
+    res.status(401)
+    throw new Error('User not found')
+  }
+
+  // make sure the logged in user matches the goal user
+  if(goal.user.toString() !== req.user.id){
+    res.status(401)
+    throw new Error('User not authorized')
+  }
+
   await goal.remove
-  res.status(200).json({ id: req.params.id });
-});
+  res.status(200).json({ id: req.params.id })
+})
 
 // eexporting
 module.exports = {
