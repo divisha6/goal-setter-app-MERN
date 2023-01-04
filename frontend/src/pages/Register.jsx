@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { FaUser } from "react-icons/fa";
+// useSelector is used to select something from the state - isLoading, isError, etc
+// useDispatch is for dispatching functions like register or async Thunk function or reset function
+import {useSelector, useDispatch} from 'react-redux'
+import { register, reset } from "../features/auth/authSlice";
+import {useNavigate } from 'react-router-dom'
+import {toast } from 'react-toastify'
 
 function Register() {
   const [formData, setFormData] = useState({
